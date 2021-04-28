@@ -1,10 +1,10 @@
 use std::fmt;
 
-use key_hash_set::{ KeyHashSet, GetKeyType, IteratorWrapper };
+use key_hash_set::{ KeySet, GetKeyType, IteratorWrapper, debug_key };
 
 #[test]
 fn create_cutomhashset_basictype() {
-    let mut myset = KeyHashSet::new(None);
+    let mut myset = KeySet::new(debug_key);
 
     myset.insert("a");
     myset.insert("b");
@@ -63,9 +63,9 @@ fn create_cutomhashset_struct() {
 
     let get_key_func_byname= |person: &Person| String::from(&person.name);
 
-    let get_key = Some(get_key_func_byname as GetKeyType<Person>);
+    let get_key = get_key_func_byname as GetKeyType<Person>;
 
-    let mut myset:KeyHashSet<Person> = KeyHashSet::new(get_key);
+    let mut myset:KeySet<Person> = KeySet::new(get_key);
 
     myset.insert(person1);
     myset.insert(person2);
@@ -108,26 +108,26 @@ fn for_into_iterator() {
 
 #[test]
 fn tellme_set_relationship_basictype() {
-    let mut set1 = KeyHashSet::new(None);
+    let mut set1 = KeySet::new(debug_key);
     set1.insert("a");
     set1.insert("b");
     set1.insert("c");
 
-    let mut set2 = KeyHashSet::new(None);
+    let mut set2 = KeySet::new(debug_key);
     set2.insert("a");
     set2.insert("b");
 
     assert!(set1.is_superset(&set2));
     assert!(set2.is_subset(&set1));
 
-    let mut set3 = KeyHashSet::new(None);
+    let mut set3 = KeySet::new(debug_key);
     set3.insert("a");
     set3.insert("b");
 
     assert!(set3.is_superset(&set2));
     assert!(set2.is_subset(&set3));
 
-    let set4:KeyHashSet<&str> = KeyHashSet::new(None);
+    let set4:KeySet<&str> = KeySet::new(debug_key);
     assert!(set4.is_empty());
 
     assert!(set1.is_disjoint(&set4));
@@ -136,12 +136,12 @@ fn tellme_set_relationship_basictype() {
 
 #[test]
 fn set_op_basictype() {
-    let mut set1 = KeyHashSet::new(None);
+    let mut set1 = KeySet::new(debug_key);
     set1.insert("a");
     set1.insert("b");
     set1.insert("c");
 
-    let mut set2 = KeyHashSet::new(None);
+    let mut set2 = KeySet::new(debug_key);
     set2.insert("d");
     set2.insert("b");
     set2.insert("e");
@@ -149,14 +149,14 @@ fn set_op_basictype() {
     // test union
     let unioned_set = set1.union(&set2);
 
-    let mut set3 = KeyHashSet::new(None);
+    let mut set3 = KeySet::new(debug_key);
     set3.insert("b");
 
     assert_eq!(unioned_set, set3);
 
     // test intersection
     let intersectioned_set =  set1.intersection(&set2);
-    let mut set4 = KeyHashSet::new(None);
+    let mut set4 = KeySet::new(debug_key);
     set4.insert("a");
     set4.insert("b");
     set4.insert("c");
@@ -168,14 +168,14 @@ fn set_op_basictype() {
 
     // test difference
     let differenced_set = set1.difference(&set2);
-    let mut set5 = KeyHashSet::new(None);
+    let mut set5 = KeySet::new(debug_key);
     set5.insert("a");
     set5.insert("c");
 
     assert_eq!(differenced_set, set5);
 
     // test symmertic_difference
-    let mut set6 = KeyHashSet::new(None);
+    let mut set6 = KeySet::new(debug_key);
     set6.insert("a");
     set6.insert("c");
     set6.insert("d");
@@ -185,7 +185,7 @@ fn set_op_basictype() {
 
 #[test]
 fn set_io_basictype() {
-    let mut set1 = KeyHashSet::new(None);
+    let mut set1 = KeySet::new(debug_key);
     set1.insert("a");
     set1.insert("b");
     set1.insert("c");
@@ -265,26 +265,26 @@ static GET_KEY_FUNC:GetKeyType<Person> = |person: &Person| person.id.to_string()
 
 #[test]
 fn tellme_set_relationship_struct() {
-    let mut set1 = KeyHashSet::new(Some(GET_KEY_FUNC));
+    let mut set1 = KeySet::new(GET_KEY_FUNC);
     set1.insert(gen_person_sample("a"));
     set1.insert(gen_person_sample("b"));
     set1.insert(gen_person_sample("c"));
 
-    let mut set2 = KeyHashSet::new(Some(GET_KEY_FUNC));
+    let mut set2 = KeySet::new(GET_KEY_FUNC);
     set2.insert(gen_person_sample("a"));
     set2.insert(gen_person_sample("b"));
 
     assert!(set1.is_superset(&set2));
     assert!(set2.is_subset(&set1));
 
-    let mut set3 = KeyHashSet::new(Some(GET_KEY_FUNC));
+    let mut set3 = KeySet::new(GET_KEY_FUNC);
     set3.insert(gen_person_sample("a"));
     set3.insert(gen_person_sample("b"));
 
     assert!(set3.is_superset(&set2));
     assert!(set2.is_subset(&set3));
 
-    let set4:KeyHashSet<Person> = KeyHashSet::new(Some(GET_KEY_FUNC));
+    let set4:KeySet<Person> = KeySet::new(GET_KEY_FUNC);
     assert!(set4.is_empty());
 
     assert!(set1.is_disjoint(&set4));
@@ -293,12 +293,12 @@ fn tellme_set_relationship_struct() {
 
 #[test]
 fn set_op_struct() {
-    let mut set1 = KeyHashSet::new(None);
+    let mut set1 = KeySet::new(debug_key);
     set1.insert(gen_person_sample("a"));
     set1.insert(gen_person_sample("b"));
     set1.insert(gen_person_sample("c"));
 
-    let mut set2 = KeyHashSet::new(None);
+    let mut set2 = KeySet::new(debug_key);
     set2.insert(gen_person_sample("b"));
     set2.insert(gen_person_sample("d"));
     set2.insert(gen_person_sample("e"));
@@ -306,14 +306,14 @@ fn set_op_struct() {
     // test union
     let unioned_set = set1.union(&set2);
 
-    let mut set3 = KeyHashSet::new(None);
+    let mut set3 = KeySet::new(debug_key);
     set3.insert(gen_person_sample("b"));
 
     assert_eq!(unioned_set, set3);
 
     // test intersection
     let intersectioned_set =  set1.intersection(&set2);
-    let mut set4 = KeyHashSet::new(None);
+    let mut set4 = KeySet::new(debug_key);
     set4.insert(gen_person_sample("a"));
     set4.insert(gen_person_sample("b"));
     set4.insert(gen_person_sample("c"));
@@ -325,14 +325,14 @@ fn set_op_struct() {
 
     // test difference
     let differenced_set = set1.difference(&set2);
-    let mut set5 = KeyHashSet::new(None);
+    let mut set5 = KeySet::new(debug_key);
     set5.insert(gen_person_sample("a"));
     set5.insert(gen_person_sample("c"));
 
     assert_eq!(differenced_set, set5);
 
     // test symmertic_difference
-    let mut set6 = KeyHashSet::new(None);
+    let mut set6 = KeySet::new(debug_key);
     set6.insert(gen_person_sample("a"));
     set6.insert(gen_person_sample("c"));
     set6.insert(gen_person_sample("d"));
@@ -342,7 +342,7 @@ fn set_op_struct() {
 
 #[test]
 fn set_io_struct() {
-    let mut set1 = KeyHashSet::new(None);
+    let mut set1 = KeySet::new(debug_key);
     set1.insert(gen_person_sample("a"));
     set1.insert(gen_person_sample("b"));
     set1.insert(gen_person_sample("c"));

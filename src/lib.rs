@@ -1,5 +1,5 @@
-mod key_hash_set;
+mod key_set;
 
-pub use crate::key_hash_set::{
-    KeyHashSet, GetKeyType, IteratorWrapper
+pub use crate::key_set::{
+    KeySet, GetKeyType, IteratorWrapper, debug_key
 };

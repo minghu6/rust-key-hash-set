@@ -2,36 +2,27 @@
 
 use std::collections::{ HashMap };
 use std::collections::hash_map;
-use std::hash::{Hash, Hasher};
+use std::hash::{ Hash };
 use std::iter:: { Map };
 use std::fmt;
 
 pub type GetKeyType<T> = fn(&T) -> String;
 pub type Map2SetType<T> = fn((String, T)) -> T;
 
-pub struct KeyHashSet<T> {
+pub struct KeySet<T> {
     get_key: GetKeyType<T>,
     _value_map: HashMap<String, T>,
 }
 
-impl<T> KeyHashSet<T> where T:Hash + Clone {
-    fn default_get_key(value:&T) -> String where T: Hash {
-        let mut hasher = hash_map::DefaultHasher::new();
-        value.hash(&mut hasher);
-        hasher.finish().to_string()
-    }
+pub fn debug_key<T: fmt::Debug>(value: &T) -> String {
+    format!("{:?}", value)
+}
 
-    pub fn new(get_key_option:Option<GetKeyType<T>>) -> Self {
+impl<T> KeySet<T> where T: Clone {
+    pub fn new(get_key: GetKeyType<T>) -> Self {
         let _value_map:HashMap<String, T> = HashMap::new();
-        let get_key;
 
-        if let Some(passed_get_key) = get_key_option {
-            get_key = passed_get_key;
-        } else {
-            get_key = KeyHashSet::default_get_key;
-        }
-
-        KeyHashSet {
+        KeySet {
             get_key,
             _value_map,
         }
@@ -100,7 +91,7 @@ impl<T> KeyHashSet<T> where T:Hash + Clone {
     }
 
     pub fn intersection<'a>(&'a self, other: &'a Self) -> Self {
-        let mut new_set = KeyHashSet::new(Some(self.get_key));
+        let mut new_set = KeySet::new(self.get_key);
         for v in self.iter().chain(other.iter()) {
             new_set.insert(v.clone())
         }
@@ -109,7 +100,7 @@ impl<T> KeyHashSet<T> where T:Hash + Clone {
     }
 
     pub fn union<'a>(&'a self, other: &'a Self) -> Self {
-        let mut new_set = KeyHashSet::new(Some(self.get_key));
+        let mut new_set = KeySet::new(self.get_key);
 
         for v in self.iter().filter(|v| other.contains(v)) {
             new_set.insert(v.clone())
@@ -119,7 +110,7 @@ impl<T> KeyHashSet<T> where T:Hash + Clone {
     }
 
     pub fn difference<'a>(&'a self, other: &'a Self) -> Self {
-        let mut new_set = KeyHashSet::new(Some(self.get_key));
+        let mut new_set = KeySet::new(self.get_key);
 
         for v in self.iter().filter(|v| !other.contains(v)) {
             new_set.insert(v.clone())
@@ -129,7 +120,7 @@ impl<T> KeyHashSet<T> where T:Hash + Clone {
     }
 
     pub fn symmetric_difference<'a>(&'a self, other: &'a Self) -> Self {
-        let mut new_set = KeyHashSet::new(Some(self.get_key));
+        let mut new_set = KeySet::new(self.get_key);
 
         for v in self.iter().filter(|v| !other.contains(v)) {
             new_set.insert(v.clone())
@@ -144,7 +135,7 @@ impl<T> KeyHashSet<T> where T:Hash + Clone {
 }
 
 
-impl<T> IntoIterator for KeyHashSet<T> {
+impl<T> IntoIterator for KeySet<T> {
     type Item = T;
     type IntoIter = Map<hash_map::IntoIter<String, T>, Map2SetType<T>>;
 
@@ -153,13 +144,13 @@ impl<T> IntoIterator for KeyHashSet<T> {
     }
 }
 
-impl<T> PartialEq for KeyHashSet<T> where T: Hash + Clone {
+impl<T> PartialEq for KeySet<T> where T: Hash + Clone {
     fn eq(&self, other: &Self) -> bool {
         self.is_subset(other) && other.is_subset(self)
     }
 }
 
-impl<T> fmt::Debug for KeyHashSet<T> where T: fmt::Debug {
+impl<T> fmt::Debug for KeySet<T> where T: fmt::Debug {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("KeyHashSet")
          .field("_value_map", &self._value_map)

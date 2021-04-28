@@ -1,4 +1,4 @@
-## A HashSet wrapper supports the key function.
+## A Key Set supports the flexiable key function.
 
 ## Add it to dependecy
 

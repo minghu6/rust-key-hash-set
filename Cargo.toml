@@ -1,7 +1,8 @@
 [package]
-name = "key-hash-set"
+name = "key-set"
 version = "0.1.0"
 authors = ["minghu6 <a19678zy@163.com>"]
 edition = "2018"
 
 [dependencies]
+indexmap = "^1.6.2"

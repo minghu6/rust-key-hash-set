@@ -1,6 +1,6 @@
 use std::fmt;
 
-use key_set::{ KeyHashSet, KeySet, GetKeyType, debug_key };
+use key_set::{ KeyHashSet, KeySet, KeySetBase, GetKeyType, debug_key };
 
 #[test]
 fn create_cutomhashset_basictype() {
@@ -353,4 +353,3 @@ fn set_io_struct() {
 
     assert!(set1.contains(&gen_person_sample("c")))
 }
-

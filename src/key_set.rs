@@ -14,11 +14,11 @@ pub type Map2SetType<T, K> = fn((K, T)) -> T;
 ////////////////////////////////////////////////////////////////////////////////
 /// KeySet
 
-pub trait KeySet <T, K> {
+pub trait KeySetBase <T, K> {
     /**
     * Create KeySet
     */
-    fn new(get_key: GetKeyType<T, K>) -> Self;
+    fn new(get_key: GetKeyType<T, K>) -> Self where Self: Sized;
 
     /**
     * Operate KeySet elem
@@ -30,7 +30,15 @@ pub trait KeySet <T, K> {
     fn get(&mut self, value: &T) -> Option<&T>;
     fn len(&self) -> usize;
     fn iter(&self) -> vec::IntoIter<&T>;
+}
 
+impl <T, K>PartialEq for dyn KeySetBase<T, K> {
+    fn eq(&self, other: &dyn KeySetBase<T, K>) -> bool {
+        self.iter().all(|x| other.contains(&x))
+    }
+}
+
+pub trait KeySet<T, K> : KeySetBase<T, K> {
     /**
     * Check KeySet relationship
     */
@@ -59,7 +67,6 @@ pub trait KeySet <T, K> {
     fn symmetric_difference<'a>(&'a self, other: &'a Self) -> Self;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 /// Utils
 
@@ -76,7 +83,7 @@ pub struct KeyHashSet<T, K: Hash> {
     _value_map: HashMap<K, T>,
 }
 
-impl <T, K> KeySet<T, K> for KeyHashSet<T, K> where T: Clone, K: Eq + Hash {
+impl <T, K> KeySetBase<T, K> for KeyHashSet<T, K> where T: Clone, K: Eq + Hash {
     fn new(get_key: GetKeyType<T, K>) -> Self {
         let _value_map:HashMap<K, T> = HashMap::new();
 
@@ -133,7 +140,10 @@ impl <T, K> KeySet<T, K> for KeyHashSet<T, K> where T: Clone, K: Eq + Hash {
         let res: Vec<&T> = self._value_map.values ().collect();
         res.into_iter()
     }
+}
 
+
+impl <T, K> KeySet<T, K> for KeyHashSet<T, K> where T: Clone, K: Eq + Hash {
     fn intersection<'a>(&'a self, other: &'a Self) -> Self {
         let mut new_set = KeyHashSet::new(self.get_key);
         for v in self.iter().chain(other.iter()) {
@@ -176,7 +186,10 @@ impl <T, K> KeySet<T, K> for KeyHashSet<T, K> where T: Clone, K: Eq + Hash {
 
         new_set
     }
+
 }
+
+
 
 /// IntoIterator for KeyHashSet
 impl<T, K> IntoIterator for KeyHashSet<T, K> where K: Hash {
@@ -188,11 +201,11 @@ impl<T, K> IntoIterator for KeyHashSet<T, K> where K: Hash {
     }
 }
 
-impl<T, K> PartialEq for KeyHashSet<T, K> where T: Clone, K: Eq + Hash {
-    fn eq(&self, other: &Self) -> bool {
-        self.is_subset(other) && other.is_subset(self)
-    }
-}
+// impl<T, K> PartialEq for KeyHashSet<T, K> where T: Clone, K: Eq + Hash {
+//     fn eq(&self, other: &Self) -> bool {
+//         self.is_subset(other) && other.is_subset(self)
+//     }
+// }
 
 impl<T, K> fmt::Debug for KeyHashSet<T, K> where T: Clone + fmt::Debug, K: fmt::Debug + Hash {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

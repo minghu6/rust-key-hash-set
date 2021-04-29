@@ -3,7 +3,7 @@
 use std::collections::hash_map::{ HashMap };
 use std::collections::hash_map;
 use std::hash::{ Hash };
-use std::iter:: { Map };
+use std::iter:: { Map, IntoIterator };
 use std::fmt;
 use std::vec;
 
@@ -19,6 +19,8 @@ pub trait KeySet <T, K> {
     * Create KeySet
     */
     fn new(get_key: GetKeyType<T, K>) -> Self;
+
+    fn from(get_key: GetKeyType<T, K>, iter: impl IntoIterator<Item=T>) -> Self;
 
     /**
     * Operate KeySet elem
@@ -84,6 +86,14 @@ impl <T, K> KeySet<T, K> for KeyHashSet<T, K> where T: Clone, K: Eq + Hash {
             get_key,
             _value_map,
         }
+    }
+
+    fn from(get_key: GetKeyType<T, K>, iter: impl IntoIterator<Item=T>) -> Self {
+        let mut this = Self::new(get_key);
+        for e in iter {
+            this.insert(e);
+        }
+        this
     }
 
     fn insert(&mut self, value:T) {
@@ -188,12 +198,14 @@ impl<T, K> IntoIterator for KeyHashSet<T, K> where K: Hash {
     }
 }
 
+/// PartialEq for KeyHashSet
 impl<T, K> PartialEq for KeyHashSet<T, K> where T: Clone, K: Eq + Hash {
     fn eq(&self, other: &Self) -> bool {
         self.is_subset(other) && other.is_subset(self)
     }
 }
 
+/// Debug for KeyHashSet
 impl<T, K> fmt::Debug for KeyHashSet<T, K> where T: Clone + fmt::Debug, K: fmt::Debug + Hash {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("KeyHashSet")

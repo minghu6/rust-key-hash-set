@@ -354,3 +354,11 @@ fn set_io_struct() {
     assert!(set1.contains(&gen_person_sample("c")))
 }
 
+#[test]
+fn from_iter_create_keyset() {
+    let v = vec![gen_person_sample("a"), gen_person_sample("b")];
+    let set1: KeyHashSet<Person, String> = KeySet::from(debug_key, v);
+
+    assert!(set1.contains(&gen_person_sample("b")));
+    assert!(set1.contains(&gen_person_sample("a")));
+}

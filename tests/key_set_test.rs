@@ -357,8 +357,25 @@ fn set_io_struct() {
 #[test]
 fn from_iter_create_keyset() {
     let v = vec![gen_person_sample("a"), gen_person_sample("b")];
-    let set1: KeyHashSet<Person, String> = KeySet::from(debug_key, v);
+    let set1: KeyHashSet<Person, String> = KeySet::from_intoiter(debug_key, v);
 
     assert!(set1.contains(&gen_person_sample("b")));
     assert!(set1.contains(&gen_person_sample("a")));
+}
+
+
+#[test]
+fn extend_set() {
+    let mut set1 = KeyHashSet::new(debug_key);
+    set1.insert(gen_person_sample("a"));
+    set1.insert(gen_person_sample("b"));
+
+    let mut set2 = KeyHashSet::new(debug_key);
+    set2.insert(gen_person_sample("c"));
+
+    set1.extend(set2);
+
+    assert!(set1.contains(&gen_person_sample("a")));
+    assert!(set1.contains(&gen_person_sample("b")));
+    assert!(set1.contains(&gen_person_sample("c")));
 }

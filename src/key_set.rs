@@ -20,7 +20,7 @@ pub trait KeySet <T, K> {
     */
     fn new(get_key: GetKeyType<T, K>) -> Self;
 
-    fn from(get_key: GetKeyType<T, K>, iter: impl IntoIterator<Item=T>) -> Self;
+    fn from_intoiter(get_key: GetKeyType<T, K>, iter: impl IntoIterator<Item=T>) -> Self;
 
     /**
     * Operate KeySet elem
@@ -88,7 +88,7 @@ impl <T, K> KeySet<T, K> for KeyHashSet<T, K> where T: Clone, K: Eq + Hash {
         }
     }
 
-    fn from(get_key: GetKeyType<T, K>, iter: impl IntoIterator<Item=T>) -> Self {
+    fn from_intoiter(get_key: GetKeyType<T, K>, iter: impl IntoIterator<Item=T>) -> Self {
         let mut this = Self::new(get_key);
         for e in iter {
             this.insert(e);
@@ -214,6 +214,19 @@ impl<T, K> fmt::Debug for KeyHashSet<T, K> where T: Clone + fmt::Debug, K: fmt::
     }
 }
 
+/// Extend for KeyHashSet
+
+impl<T, K> Extend<T> for KeyHashSet<T, K> where T: Clone, K: Hash + Eq {
+    fn extend<I: IntoIterator<Item = T>>(&mut self, iter: I) {
+        for item in iter {
+            self.insert(item);
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// IteratorWrapper
 /// Just for hide abstraction
 pub struct IteratorWrapper<I, T> where I: Iterator<Item=T> {
     iter: I,

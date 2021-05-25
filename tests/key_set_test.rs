@@ -1,6 +1,6 @@
 use std::fmt;
 
-use key_set::{ KeyHashSet, KeySet, GetKeyType, debug_key };
+use m6_key_set::{ KeyHashSet, KeySet, GetKeyType, debug_key };
 
 #[test]
 fn create_cutomhashset_basictype() {

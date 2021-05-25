@@ -1,8 +1,12 @@
 [package]
-name = "key-set"
-version = "0.1.0"
+name = "m6-key-set"
+version = "0.2.1"
 authors = ["minghu6 <a19678zy@163.com>"]
 edition = "2018"
+readme = "README.md"
+repository = "https://github.com/minghu6/rust-key-set/"
+license = "0BSD"
+description = "Python like Set collection, enable hash by a key function"
 
 [dependencies]
 indexmap = "^1.6.2"
